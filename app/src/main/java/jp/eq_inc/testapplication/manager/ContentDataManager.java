@@ -4,6 +4,8 @@ import android.content.Context;
 
 import java.util.ArrayList;
 
+import jp.eq_inc.testapplication.data.ContentCategoryList;
+
 public class ContentDataManager {
     private static final int DataLoaderPreset = 0;
     private static ContentDataManager sInstance = null;
@@ -39,6 +41,16 @@ public class ContentDataManager {
 
     public DataLoader.DataStatus getPresetCurrentDataLoadStatus(){
         return mDataLoaderArray[DataLoaderPreset].getCurrentDataLoadStatus();
+    }
+
+    public ContentCategoryList getPresetContentList(){
+        ContentCategoryList ret = null;
+
+        if(mDataLoaderArray[DataLoaderPreset].getCurrentDataLoadStatus() == DataLoader.DataStatus.loaded){
+            ret = mDataLoaderArray[DataLoaderPreset].getContentList();
+        }
+
+        return ret;
     }
 
     public void loadPresetContents(){

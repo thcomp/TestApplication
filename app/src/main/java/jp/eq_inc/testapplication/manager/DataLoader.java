@@ -1,6 +1,10 @@
 package jp.eq_inc.testapplication.manager;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+
+import jp.eq_inc.testapplication.data.ContentCategoryList;
 
 public abstract class DataLoader {
     public enum DataStatus{
@@ -12,11 +16,14 @@ public abstract class DataLoader {
     protected Context mContext;
     private DataStatus mDataStatus = DataStatus.none;
     private DataLoadListener mDataLoadListener;
+    private Handler mMainLooperHandler = null;
 
     abstract protected boolean loadData();
+    abstract public ContentCategoryList getContentList();
 
     public DataLoader(Context context){
         mContext = context;
+        mMainLooperHandler = new Handler(Looper.getMainLooper());
     }
 
     public void setDataLoadListener(DataLoadListener listener){
@@ -35,16 +42,42 @@ public abstract class DataLoader {
                     new Thread(mLoadDataRunnable).start();
                     break;
                 case loading:
-                    if(mDataLoadListener != null){
-                        mDataLoadListener.onStartLoading();
-                    }
+                    callStartLoadingListener();
                     break;
                 case loaded:
-                    if(mDataLoadListener != null){
-                        mDataLoadListener.onStartLoading();
-                        mDataLoadListener.onEndLoading(true);
-                    }
+                    callStartLoadingListener();
+                    callEndLoadingListener(true);
                     break;
+            }
+        }
+    }
+
+    private void callStartLoadingListener(){
+        if(mDataLoadListener != null) {
+            if (Thread.currentThread().equals(mContext.getMainLooper().getThread())) {
+                mDataLoadListener.onStartLoading();
+            } else {
+                mMainLooperHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callStartLoadingListener();
+                    }
+                });
+            }
+        }
+    }
+
+    private void callEndLoadingListener(final boolean result){
+        if(mDataLoadListener != null) {
+            if (Thread.currentThread().equals(mContext.getMainLooper().getThread())) {
+                mDataLoadListener.onEndLoading(result);
+            } else {
+                mMainLooperHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callEndLoadingListener(result);
+                    }
+                });
             }
         }
     }
@@ -52,9 +85,7 @@ public abstract class DataLoader {
     private Runnable mLoadDataRunnable = new Runnable() {
         @Override
         public void run() {
-            if(mDataLoadListener != null){
-                mDataLoadListener.onStartLoading();
-            }
+            callStartLoadingListener();
 
             if(loadData()){
                 mDataStatus = DataStatus.loaded;
@@ -62,9 +93,7 @@ public abstract class DataLoader {
                 mDataStatus = DataStatus.none;
             }
 
-            if(mDataLoadListener != null){
-                mDataLoadListener.onEndLoading(mDataStatus == DataStatus.loaded);
-            }
+            callEndLoadingListener(mDataStatus == DataStatus.loaded);
         }
     };
 }

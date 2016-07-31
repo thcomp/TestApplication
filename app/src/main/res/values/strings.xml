@@ -1,9 +1,5 @@
 <resources>
-    <string name="app_name">TestApplication</string>
+    <string name="app_name" translatable="false">TestApplication</string>
 
-    <string name="title_activity_splash">SplashActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
-
-    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="fail_to_load_content">fail to expand contents</string>
 </resources>
