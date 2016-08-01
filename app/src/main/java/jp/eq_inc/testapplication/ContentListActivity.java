@@ -1,6 +1,7 @@
 package jp.eq_inc.testapplication;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -63,6 +64,10 @@ public class ContentListActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             ContentCategoryList.ContentCategoryData item = (ContentCategoryList.ContentCategoryData) parent.getSelectedItem();
+            Intent intent = new Intent();
+            intent.setClass(ContentListActivity.this, ContentActivity.class);
+            intent.putExtra(Common.IntentParcelableExtraPresetContentCategoryData, item);
+            startActivity(intent);
         }
     };
 

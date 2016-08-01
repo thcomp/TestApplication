@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +24,7 @@ public class PresetContentCategoryList extends ContentCategoryList {
         return ((contents != null) && (index >= 0 && index < contents.size())) ? contents.get(index) : null;
     }
 
-    public static class PresetContentData implements ContentCategoryData {
+    public static class PresetContentData implements ContentCategoryData, Parcelable {
         public String title;
         public String icon_name;
         public String content_range;
@@ -30,6 +32,30 @@ public class PresetContentCategoryList extends ContentCategoryList {
 
         private String[] mContents = null;
         private ShowLockType mShowLockType = null;
+
+        public PresetContentData(){
+            // no work
+        }
+
+        protected PresetContentData(Parcel in) {
+            title = in.readString();
+            icon_name = in.readString();
+            content_range = in.readString();
+            show_lock = in.readString();
+            mContents = in.createStringArray();
+        }
+
+        public static final Creator<PresetContentData> CREATOR = new Creator<PresetContentData>() {
+            @Override
+            public PresetContentData createFromParcel(Parcel in) {
+                return new PresetContentData(in);
+            }
+
+            @Override
+            public PresetContentData[] newArray(int size) {
+                return new PresetContentData[size];
+            }
+        };
 
         @Override
         public String getTitle(Context context) {
@@ -116,6 +142,20 @@ public class PresetContentCategoryList extends ContentCategoryList {
             }
 
             return ret;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(title);
+            dest.writeString(icon_name);
+            dest.writeString(content_range);
+            dest.writeString(show_lock);
+            dest.writeStringArray(mContents);
         }
     }
 }
