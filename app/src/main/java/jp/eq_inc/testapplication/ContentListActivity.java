@@ -66,7 +66,7 @@ public class ContentListActivity extends AppCompatActivity {
             ContentCategoryList.ContentCategoryData item = (ContentCategoryList.ContentCategoryData) parent.getSelectedItem();
             Intent intent = new Intent();
             intent.setClass(ContentListActivity.this, ContentActivity.class);
-            intent.putExtra(Common.IntentParcelableExtraPresetContentCategoryData, item);
+            intent.putExtra(Common.IntentParcelableExtraContentCategoryData, item);
             startActivity(intent);
         }
     };

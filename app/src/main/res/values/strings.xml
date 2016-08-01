@@ -2,5 +2,7 @@
     <string name="app_name" translatable="false">TestApplication</string>
 
     <string name="fail_to_load_content">fail to expand contents</string>
+    <string name="read_from_the_beginning">Read from\nthe beginning</string>
+    <string name="read_from_continued">Read from\ncontinued</string>
     <string name="title_activity_main">MainActivity</string>
 </resources>

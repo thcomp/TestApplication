@@ -7,11 +7,16 @@ import android.graphics.BitmapFactory;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.bluelinelabs.logansquare.annotation.JsonField;
+import com.bluelinelabs.logansquare.annotation.JsonObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+@JsonObject
 public class PresetContentCategoryList extends ContentCategoryList {
+    @JsonField
     public ArrayList<PresetContentData> contents;
 
     @Override
@@ -24,10 +29,17 @@ public class PresetContentCategoryList extends ContentCategoryList {
         return ((contents != null) && (index >= 0 && index < contents.size())) ? contents.get(index) : null;
     }
 
+    @JsonObject
     public static class PresetContentData implements ContentCategoryData, Parcelable {
+        @JsonField
+        public String id;
+        @JsonField
         public String title;
+        @JsonField
         public String icon_name;
+        @JsonField
         public String content_range;
+        @JsonField
         public String show_lock;
 
         private String[] mContents = null;
@@ -38,6 +50,7 @@ public class PresetContentCategoryList extends ContentCategoryList {
         }
 
         protected PresetContentData(Parcel in) {
+            id = in.readString();
             title = in.readString();
             icon_name = in.readString();
             content_range = in.readString();
@@ -56,6 +69,11 @@ public class PresetContentCategoryList extends ContentCategoryList {
                 return new PresetContentData[size];
             }
         };
+
+        @Override
+        public String getId(Context context) {
+            return id;
+        }
 
         @Override
         public String getTitle(Context context) {
@@ -151,6 +169,7 @@ public class PresetContentCategoryList extends ContentCategoryList {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(id);
             dest.writeString(title);
             dest.writeString(icon_name);
             dest.writeString(content_range);

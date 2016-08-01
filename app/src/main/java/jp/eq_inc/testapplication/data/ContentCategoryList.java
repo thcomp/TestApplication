@@ -13,6 +13,7 @@ abstract public class ContentCategoryList {
     }
 
     public static interface ContentCategoryData extends Parcelable {
+        abstract public String getId(Context context);
         abstract public String getTitle(Context context);
         abstract public Bitmap getIcon(Context context);
         abstract public int getContentCount(Context context);

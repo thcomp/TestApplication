@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="fail_to_load_content">コンテンツの展開に失敗しました</string>
+    <string name="read_from_the_beginning">最初から\n読む</string>
+    <string name="read_from_continued">つづきから\n読む</string>
 </resources>

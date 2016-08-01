@@ -19,15 +19,19 @@
         </activity>
         <activity
             android:name=".ContentListActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar" />
-        <activity android:name=".ContentActivity"
-            android:parentActivityName=".ContentListActivity">
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ContentActivity"
+            android:parentActivityName=".ContentListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="jp.eq_inc.testapplication.ContentListActivity" />
         </activity>
-        <activity android:name=".ContentScreenActivity"
-            android:parentActivityName=".ContentActivity">
+        <activity
+            android:name=".ContentScreenActivity"
+            android:parentActivityName=".ContentActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="jp.eq_inc.testapplication.ContentListActivity" />
