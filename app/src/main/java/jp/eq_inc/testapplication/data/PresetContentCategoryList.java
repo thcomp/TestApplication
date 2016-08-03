@@ -82,7 +82,7 @@ public class PresetContentCategoryList extends ContentCategoryList {
 
         @Override
         public Bitmap getIcon(Context context) {
-            return decodeBitmap(context, icon_name);
+            return decodeBitmap(context, "icon/" + icon_name + ".png");
         }
 
         @Override

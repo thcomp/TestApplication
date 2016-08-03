@@ -16,16 +16,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.HashMap;
+
 import jp.eq_inc.testapplication.data.ContentCategoryList;
 import jp.eq_inc.testapplication.manager.ContentDataManager;
 import jp.eq_inc.testapplication.manager.DataLoadListener;
 import jp.eq_inc.testapplication.task.BitmapDecoderTask;
 
 public class ContentListActivity extends AppCompatActivity {
-    private static final int ViewTagIconBitmap = "ViewTagIconBitmap".hashCode();
-    private static final int ViewTagDecodeParam = "ViewTagDecodeParam".hashCode();
     private Integer mFirstVisibleItemIndex = null;
     private ContentListAdapter mContentListAdapter;
+//    private HashMap<Bitmap, Object> mDecodedBitmapMap = new HashMap<Bitmap, Object>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +35,7 @@ public class ContentListActivity extends AppCompatActivity {
 
         ListView lvContentListView = (ListView) findViewById(R.id.lvContentList);
         lvContentListView.setOnScrollListener(mContentListScrollListener);
-        lvContentListView.setAdapter(mContentListAdapter = new ContentListAdapter(this));
+        lvContentListView.setAdapter(mContentListAdapter = new ContentListAdapter(this, /*mDecodedBitmapMap*/null));
         lvContentListView.setOnItemClickListener(mItemClickListener);
 
         ContentDataManager contentManager = ContentDataManager.getInstance(this);
@@ -58,12 +59,19 @@ public class ContentListActivity extends AppCompatActivity {
 
         ContentDataManager contentManager = ContentDataManager.getInstance(this);
         contentManager.unregisterPresetDataLoadListener(mPresetDataLoadListener);
+//
+//        Set<Bitmap> bitmapSet = mDecodedBitmapMap.keySet();
+//        Iterator<Bitmap> iterator = bitmapSet.iterator();
+//        while (iterator.hasNext()) {
+//            iterator.next().recycle();
+//        }
+//        mDecodedBitmapMap.clear();
     }
 
     private AdapterView.OnItemClickListener mItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            ContentCategoryList.ContentCategoryData item = (ContentCategoryList.ContentCategoryData) parent.getSelectedItem();
+            ContentCategoryList.ContentCategoryData item = (ContentCategoryList.ContentCategoryData) parent.getItemAtPosition(position);
             Intent intent = new Intent();
             intent.setClass(ContentListActivity.this, ContentActivity.class);
             intent.putExtra(Common.IntentParcelableExtraContentCategoryData, item);
@@ -113,10 +121,12 @@ public class ContentListActivity extends AppCompatActivity {
 
     private static class ContentListAdapter extends BaseAdapter{
         private Context mContext;
+//        private HashMap<Bitmap, Object> mDecodedBitmapMap;
         private ContentCategoryList mContentCategoryList;
 
-        public ContentListAdapter(Context context){
+        public ContentListAdapter(Context context, HashMap<Bitmap, Object> decodedBitmapMap){
             mContext = context;
+//            mDecodedBitmapMap = decodedBitmapMap;
         }
 
         public void setContentList(ContentCategoryList contentCategoryList){
@@ -150,10 +160,11 @@ public class ContentListActivity extends AppCompatActivity {
             }else{
                 // release old resource
                 ImageView iconImageView = (ImageView) ret.findViewById(R.id.ivIcon);
-                Bitmap oldIconBitmap = (Bitmap) iconImageView.getTag(ViewTagIconBitmap);
+                Bitmap oldIconBitmap = (Bitmap) iconImageView.getTag(Common.ViewTagIconBitmap);
                 if(oldIconBitmap != null){
+//                    mDecodedBitmapMap.remove(oldIconBitmap);
                     oldIconBitmap.recycle();
-                    iconImageView.setTag(ViewTagIconBitmap, null);
+                    iconImageView.setTag(Common.ViewTagIconBitmap, null);
                 }
             }
 
@@ -167,10 +178,11 @@ public class ContentListActivity extends AppCompatActivity {
                 @Override
                 public void onPostExecute(BitmapDecoderTask task, BitmapDecoderTask.BitmapResult[] decodedBitmaps) {
                     if(decodedBitmaps != null && decodedBitmaps.length > 0){
-                        BitmapDecoderTask.ContentCategory param = (BitmapDecoderTask.ContentCategory) fTargetImageView.getTag(ViewTagDecodeParam);
+                        BitmapDecoderTask.ContentCategory param = (BitmapDecoderTask.ContentCategory) fTargetImageView.getTag(Common.ViewTagDecodeParam);
                         if(param.equals(decodedBitmaps[0].param)){
                             // まだリサイクルされていないViewなので、デコードが完了した画像を設定
-                            fTargetImageView.setTag(ViewTagIconBitmap, decodedBitmaps[0].decodedBitmap);
+//                            mDecodedBitmapMap.put(decodedBitmaps[0].decodedBitmap, new Object());
+                            fTargetImageView.setTag(Common.ViewTagIconBitmap, decodedBitmaps[0].decodedBitmap);
                             fTargetImageView.setImageBitmap(decodedBitmaps[0].decodedBitmap);
                         }else{
                             // Viewがすでにリサイクルされて、別の画像を割りあてるようになっているので、設定せずにそのまま解放
@@ -181,13 +193,12 @@ public class ContentListActivity extends AppCompatActivity {
             });
             BitmapDecoderTask.ContentCategory param = new BitmapDecoderTask.ContentCategory();
             param.categoryData = item;
-            fTargetImageView.setTag(ViewTagDecodeParam, param);
+            task.execute(param);
+            fTargetImageView.setTag(Common.ViewTagDecodeParam, param);
 
             ((TextView)ret.findViewById(R.id.tvTitle)).setText(item.getTitle(mContext));
 
             return ret;
         }
     }
-
-
 }

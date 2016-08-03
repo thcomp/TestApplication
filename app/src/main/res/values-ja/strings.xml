@@ -3,4 +3,8 @@
     <string name="fail_to_load_content">コンテンツの展開に失敗しました</string>
     <string name="read_from_the_beginning">最初から\n読む</string>
     <string name="read_from_continued">つづきから\n読む</string>
+    <string name="first_content_in_category">最初のページです</string>
+    <string name="last_content_in_category">最後のページです</string>
+    <string name="cannot_move_to_prev_page">これ以上前のページには行けません</string>
+    <string name="cannot_move_to_next_page">これ以上後ろのページには行けません</string>
 </resources>
