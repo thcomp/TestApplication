@@ -1,5 +1,6 @@
 package jp.eq_inc.testapplication;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -49,7 +50,7 @@ public class ContentScreenActivity extends AppCompatActivity {
             ((TextView)findViewById(R.id.tvTitle)).setText(mContentData.getTitle(this));
             mContentPager = (ViewPager)findViewById(R.id.vpContentPager);
             mContentPager.setOnTouchListener(mConsumeViewPagerTouchListener);
-            mContentPager.setAdapter(/*mContentPagerAdapter*/new ContentFragmentPagerAdapter(getSupportFragmentManager()));
+            mContentPager.setAdapter(new ContentFragmentPagerAdapter(getSupportFragmentManager()));
 
             findViewById(R.id.vToNextArea).setOnClickListener(mClickListener);
             findViewById(R.id.vShowMenuArea).setOnClickListener(mClickListener);
@@ -60,11 +61,25 @@ public class ContentScreenActivity extends AppCompatActivity {
              * ViewPagerは通常は左->右にページングする部品に対して、読み物アプリは右->左にページングすることを想定している。
              * そのためViewPagerは使用する際に、反対方向に動作する必要がある。
              */
-            mContentPager.setCurrentItem(mContentData.getContentCount(this) - 1 - initPageIndex, false);
+            mContentPager.setCurrentItem(changeContentIndexToCurrentItem(initPageIndex, mContentData.getContentCount(this)), false);
 
             mDialogBuilder = new AlertDialog.Builder(this);
             mDialogBuilder.setPositiveButton(android.R.string.ok, null);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void finish() {
+        Intent intent = new Intent();
+        intent.putExtra(Common.IntentIntExtraReadIndexInCategory, changeCurrentItemToContentIndex(mContentPager.getCurrentItem(), mContentData.getContentCount(this)));
+        setResult(Activity.RESULT_OK, intent);
+
+        super.finish();
     }
 
     private View.OnClickListener mClickOnTutorialListener = new View.OnClickListener() {
@@ -138,4 +153,12 @@ public class ContentScreenActivity extends AppCompatActivity {
             return mContentData.getContentCount(ContentScreenActivity.this);
         }
     };
+
+    private static int changeCurrentItemToContentIndex(int currentItemIndex, int itemCount){
+        return itemCount - 1 - currentItemIndex;
+    }
+
+    private static int changeContentIndexToCurrentItem(int contentIndex, int itemCount){
+        return itemCount - 1 - contentIndex;
+    }
 }

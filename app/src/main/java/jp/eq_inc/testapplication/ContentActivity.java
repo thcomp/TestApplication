@@ -1,5 +1,6 @@
 package jp.eq_inc.testapplication;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import jp.eq_inc.testapplication.task.BitmapDecoderTask;
 
 public class ContentActivity extends AppCompatActivity {
 
+    private static final int RequestCodeShowContent = "RequestCodeShowContent".hashCode() & 0x0000FFFF;
     private ContentCategoryList.ContentCategoryData mContentData = null;
     private int mReadIndexFromContinued = 0;
 
@@ -33,14 +35,13 @@ public class ContentActivity extends AppCompatActivity {
             View tvReadFromContinued = findViewById(R.id.tvReadFromContinued);
             tvReadFromContinued.setOnClickListener(mClickListener);
 
-            mReadIndexFromContinued = PreferenceUtil.readPrefInt(this, mContentData.getId(this) + Common.PrefKeyLastReadIndexInCategory, 0);
+            mReadIndexFromContinued = PreferenceUtil.readPrefInt(this, Common.PrefKeyLastReadIndexInCategory + mContentData.getId(this), 0);
             if((mReadIndexFromContinued == 0) || (mReadIndexFromContinued < 0) || (mReadIndexFromContinued >= mContentData.getContentCount(this))){
-                // 値が未設定または不正な値なので、「つづきから読む」ボタンは非表示
+                // 値が未設定または不正な値なので、「つづきから読む」ボタンを無効化
                 tvReadFromContinued.setEnabled(false);
             }
             findViewById(R.id.tvReadFromTheBeginning).setOnClickListener(mClickListener);
 
-            //findViewById(R.id.ivIcon)
             BitmapDecoderTask.ContentCategory param = new BitmapDecoderTask.ContentCategory();
             param.categoryData = mContentData;
             BitmapDecoderTask task = new BitmapDecoderTask(this, mDecodeTaskListener);
@@ -51,6 +52,26 @@ public class ContentActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == RequestCodeShowContent){
+            if(resultCode == Activity.RESULT_OK && data != null){
+                mReadIndexFromContinued = data.getIntExtra(Common.IntentIntExtraReadIndexInCategory, 0);
+
+                PreferenceUtil.writePref(this, Common.PrefKeyLastReadIndexInCategory + mContentData.getId(this), mReadIndexFromContinued);
+
+                View tvReadFromContinued = findViewById(R.id.tvReadFromContinued);
+                if((mReadIndexFromContinued == 0) || (mReadIndexFromContinued < 0) || (mReadIndexFromContinued >= mContentData.getContentCount(this))){
+                    // 値が未設定または不正な値なので、「つづきから読む」ボタンを無効化
+                    tvReadFromContinued.setEnabled(false);
+                }else{
+                    // 途中まで読んだので、「つづきから読む」ボタンを有効化
+                    tvReadFromContinued.setEnabled(true);
+                }
+            }
+        }
     }
 
     private View.OnClickListener mClickListener = new View.OnClickListener() {
@@ -67,14 +88,14 @@ public class ContentActivity extends AppCompatActivity {
                 intent.putExtra(Common.IntentIntExtraReadIndexInCategory, mReadIndexFromContinued);
             }
 
-            startActivity(intent);
+            startActivityForResult(intent, RequestCodeShowContent);
         }
     };
 
     private BitmapDecoderTask.DecoderTaskListener mDecodeTaskListener = new BitmapDecoderTask.DecoderTaskListener() {
         @Override
         public void onPreExecute(BitmapDecoderTask task) {
-
+            // 処理なし
         }
 
         @Override
