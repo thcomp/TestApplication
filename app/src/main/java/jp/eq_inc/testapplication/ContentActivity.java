@@ -2,12 +2,15 @@ package jp.eq_inc.testapplication;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -31,6 +34,8 @@ public class ContentActivity extends AppCompatActivity {
             // データが渡されていないため、継続不能
             finish();
         }else{
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             setContentView(R.layout.activity_content);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);

@@ -21,6 +21,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
@@ -50,6 +52,7 @@ public class ContentScreenActivity extends AppCompatActivity {
             // データが渡されていないため、継続不能
             finish();
         }else{
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             setContentView(R.layout.activity_content_screen);
             mToolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(mToolbar);
@@ -114,7 +117,7 @@ public class ContentScreenActivity extends AppCompatActivity {
         boolean ret = false;
         int itemId = item.getItemId();
 
-        if(itemId == R.id.menuShare) {
+        if(itemId == R.id.menuShare && mToolbar.getVisibility() == View.VISIBLE) {
             Toast.makeText(ContentScreenActivity.this, R.string.under_construction, Toast.LENGTH_SHORT).show();
             ret = true;
         }else if(itemId == android.R.id.home){
