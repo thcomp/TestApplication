@@ -3,10 +3,13 @@ package jp.eq_inc.testapplication;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import jp.co.thcomp.util.PreferenceUtil;
 import jp.eq_inc.testapplication.data.ContentCategoryList;
@@ -31,6 +34,7 @@ public class ContentActivity extends AppCompatActivity {
             setContentView(R.layout.activity_content);
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
             View tvReadFromContinued = findViewById(R.id.tvReadFromContinued);
             tvReadFromContinued.setOnClickListener(mClickListener);
@@ -72,6 +76,20 @@ public class ContentActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        boolean ret = false;
+        int itemId = item.getItemId();
+
+        if(itemId == android.R.id.home){
+            Intent upIntent = NavUtils.getParentActivityIntent(this);
+            NavUtils.navigateUpTo(this, upIntent);
+            ret = true;
+        }
+
+        return ret;
     }
 
     private View.OnClickListener mClickListener = new View.OnClickListener() {

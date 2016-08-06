@@ -1,14 +1,17 @@
 <resources>
     <string name="app_name" translatable="false">TestApplication</string>
 
-    <string name="fail_to_load_content">fail to expand contents</string>
+    <string name="fail_to_load_content">Fail to expand contents</string>
     <string name="read_from_the_beginning">Read from\nthe beginning</string>
     <string name="read_from_continued">Read from\ncontinued</string>
     <string name="first_content_in_category">The first page</string>
     <string name="last_content_in_category">The last page</string>
     <string name="cannot_move_to_prev_page">Cannot move to previous page</string>
     <string name="cannot_move_to_next_page">Cannot move to next page</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="goto_prev_page">Go to previous page</string>
+    <string name="goto_next_page">Go to next page</string>
+    <string name="show_menu_button">Show menu button</string>
+    <string name="close">Close</string>
+    <string name="under_construction">under construction</string>
+    <string name="title_activity_main">MainActivity</string>
 </resources>

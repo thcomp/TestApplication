@@ -7,4 +7,9 @@
     <string name="last_content_in_category">最後のページです</string>
     <string name="cannot_move_to_prev_page">これ以上前のページには行けません</string>
     <string name="cannot_move_to_next_page">これ以上後ろのページには行けません</string>
+    <string name="goto_prev_page">前のページへ進む</string>
+    <string name="goto_next_page">次のページへ進む</string>
+    <string name="show_menu_button">メニューを開く</string>
+    <string name="close">閉じる</string>
+    <string name="under_construction">工事中</string>
 </resources>

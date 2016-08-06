@@ -3,27 +3,42 @@ package jp.eq_inc.testapplication;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.NavUtils;
+import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import jp.co.thcomp.util.PreferenceUtil;
 import jp.eq_inc.testapplication.data.ContentCategoryList;
 import jp.eq_inc.testapplication.fragment.ContentFragment;
 
 public class ContentScreenActivity extends AppCompatActivity {
+    private static final int ShowToolbarIntervalMS = (int) (3 * DateUtils.SECOND_IN_MILLIS);
     private ContentCategoryList.ContentCategoryData mContentData = null;
     private View mTutorialView = null;
+    private View mAppBarLayout;
     private ViewPager mContentPager;
-    AlertDialog.Builder mDialogBuilder;
+    private Toolbar mToolbar;
+    private AlertDialog.Builder mDialogBuilder;
+    private Handler mMainLooperHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +51,20 @@ public class ContentScreenActivity extends AppCompatActivity {
             finish();
         }else{
             setContentView(R.layout.activity_content_screen);
+            mToolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(mToolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            mAppBarLayout = findViewById(R.id.appBarLayout);
+
+            // 起動時は非表示にする
+            mAppBarLayout.setVisibility(View.GONE);
+            mToolbar.setVisibility(View.GONE);
 
             if(!PreferenceUtil.readPrefBoolean(this, Common.PrefKeyShownTutorial, false)){
                 PreferenceUtil.writePref(this, Common.PrefKeyShownTutorial, true);
                 LayoutInflater inflater = getLayoutInflater();
                 mTutorialView = inflater.inflate(R.layout.activity_content_screen_tutorial, null, false);
+                mTutorialView.setOnClickListener(mClickOnTutorialListener);
                 mTutorialView.findViewById(R.id.ivClose).setOnClickListener(mClickOnTutorialListener);
 
                 ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -65,12 +89,41 @@ public class ContentScreenActivity extends AppCompatActivity {
 
             mDialogBuilder = new AlertDialog.Builder(this);
             mDialogBuilder.setPositiveButton(android.R.string.ok, null);
+
+            mMainLooperHandler = new Handler(getMainLooper());
         }
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    public void onBackPressed() {
+        if(mTutorialView != null && mTutorialView.getVisibility() == View.VISIBLE){
+            mTutorialView.setVisibility(View.GONE);
+        }else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_content_screen, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        boolean ret = false;
+        int itemId = item.getItemId();
+
+        if(itemId == R.id.menuShare) {
+            Toast.makeText(ContentScreenActivity.this, R.string.under_construction, Toast.LENGTH_SHORT).show();
+            ret = true;
+        }else if(itemId == android.R.id.home){
+            Intent upIntent = NavUtils.getParentActivityIntent(this);
+            NavUtils.navigateUpTo(this, upIntent);
+            ret = true;
+        }
+
+        return ret;
     }
 
     @Override
@@ -85,11 +138,8 @@ public class ContentScreenActivity extends AppCompatActivity {
     private View.OnClickListener mClickOnTutorialListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            int id = v.getId();
-
-            if(id == R.id.ivClose){
-                mTutorialView.setVisibility(View.GONE);
-            }
+            // このlistenerが発動したら、無条件でチュートリアルを非表示化
+            mTutorialView.setVisibility(View.GONE);
         }
     };
 
@@ -125,6 +175,14 @@ public class ContentScreenActivity extends AppCompatActivity {
                     }
                     break;
                 case R.id.vShowMenuArea:
+                    if(mAppBarLayout.getVisibility() == View.GONE){
+                        // 表示用のアニメーションを実施
+                        mAppBarLayout.setVisibility(View.VISIBLE);
+                        mToolbar.setVisibility(View.VISIBLE);
+                        Animation showAnimation = AnimationUtils.loadAnimation(ContentScreenActivity.this, R.anim.show_toolbar);
+                        showAnimation.setAnimationListener(mShowAnimationListener);
+                        mAppBarLayout.startAnimation(showAnimation);
+                    }
                     break;
             }
         }
@@ -151,6 +209,51 @@ public class ContentScreenActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             return mContentData.getContentCount(ContentScreenActivity.this);
+        }
+    };
+
+    private Animation.AnimationListener mShowAnimationListener = new Animation.AnimationListener() {
+        @Override
+        public void onAnimationStart(Animation animation) {
+            // 処理なし
+        }
+
+        @Override
+        public void onAnimationEnd(Animation animation) {
+            // 非表示用のアニメーションに対するタイマを設定
+            mMainLooperHandler.postDelayed(mHideToolbarRunnable, ShowToolbarIntervalMS);
+        }
+
+        @Override
+        public void onAnimationRepeat(Animation animation) {
+            // 処理なし
+        }
+    };
+
+    private Animation.AnimationListener mHideAnimationListener = new Animation.AnimationListener() {
+        @Override
+        public void onAnimationStart(Animation animation) {
+            // 処理なし
+        }
+
+        @Override
+        public void onAnimationEnd(Animation animation) {
+            mAppBarLayout.setVisibility(View.GONE);
+            mToolbar.setVisibility(View.GONE);
+        }
+
+        @Override
+        public void onAnimationRepeat(Animation animation) {
+            // 処理なし
+        }
+    };
+
+    private Runnable mHideToolbarRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Animation hideAnimation = AnimationUtils.loadAnimation(ContentScreenActivity.this, R.anim.hide_toolbar);
+            hideAnimation.setAnimationListener(mHideAnimationListener);
+            mAppBarLayout.startAnimation(hideAnimation);
         }
     };
 

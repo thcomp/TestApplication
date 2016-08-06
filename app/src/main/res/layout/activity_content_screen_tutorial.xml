@@ -9,18 +9,21 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
+    android:background="@color/tutorial_bg_color"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
+        <TextView
             android:id="@+id/ivClose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:layout_alignParentRight="true"
-            android:background="#aaffffff"/>
+            android:gravity="center"
+            android:text="@string/close"
+            android:background="@color/tutorial_item_bg_color"/>
 
     </RelativeLayout>
 
@@ -34,10 +37,12 @@
         android:weightSum="0.8"
         android:orientation="horizontal">
 
-        <ImageView
+        <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:background="#aaffffff"
+            android:background="@color/tutorial_item_bg_color"
+            android:gravity="center"
+            android:text="@string/goto_next_page"
             android:layout_weight="0.2"/>
 
         <View
@@ -56,10 +61,12 @@
                 android:layout_height="0dp"
                 android:layout_weight="0.2" />
 
-            <ImageView
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:background="#aaffffff"
+                android:background="@color/tutorial_item_bg_color"
+                android:gravity="center"
+                android:text="@string/show_menu_button"
                 android:layout_weight="0.6"/>
 
             <View
@@ -73,10 +80,12 @@
             android:layout_width="16dp"
             android:layout_height="match_parent" />
 
-        <ImageView
+        <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:background="#aaffffff"
+            android:background="@color/tutorial_item_bg_color"
+            android:gravity="center"
+            android:text="@string/goto_prev_page"
             android:layout_weight="0.2"/>
     </LinearLayout>
 
