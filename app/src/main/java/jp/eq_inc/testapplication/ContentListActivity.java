@@ -4,10 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -22,6 +20,7 @@ import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import jp.eq_inc.testapplication.data.ContentCategoryList;
@@ -32,7 +31,7 @@ import jp.eq_inc.testapplication.task.BitmapDecoderTask;
 public class ContentListActivity extends AppCompatActivity {
     private int mFirstVisibleItemIndex = 0;
     private ContentListAdapter mContentListAdapter;
-    private HashMap<Bitmap, Object> mDecodedBitmapMap = new HashMap<Bitmap, Object>();
+    private HashMap<Bitmap, ImageView> mDecodedBitmapMap = new HashMap<Bitmap, ImageView>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,10 +76,12 @@ public class ContentListActivity extends AppCompatActivity {
         ContentDataManager contentManager = ContentDataManager.getInstance(this);
         contentManager.unregisterPresetDataLoadListener(mPresetDataLoadListener);
 
-        Set<Bitmap> bitmapSet = mDecodedBitmapMap.keySet();
-        Iterator<Bitmap> iterator = bitmapSet.iterator();
+        Set<Map.Entry<Bitmap, ImageView>> entrySet = mDecodedBitmapMap.entrySet();
+        Iterator<Map.Entry<Bitmap, ImageView>> iterator = entrySet.iterator();
         while (iterator.hasNext()) {
-            iterator.next().recycle();
+            Map.Entry<Bitmap, ImageView> entry = iterator.next();
+            entry.getValue().setImageBitmap(null);
+            entry.getKey().recycle();
         }
         mDecodedBitmapMap.clear();
     }
@@ -138,10 +139,10 @@ public class ContentListActivity extends AppCompatActivity {
 
     private static class ContentListAdapter extends BaseAdapter{
         private Context mContext;
-        private HashMap<Bitmap, Object> mDecodedBitmapMap;
+        private HashMap<Bitmap, ImageView> mDecodedBitmapMap;
         private ContentCategoryList mContentCategoryList;
 
-        public ContentListAdapter(Context context, HashMap<Bitmap, Object> decodedBitmapMap){
+        public ContentListAdapter(Context context, HashMap<Bitmap, ImageView> decodedBitmapMap){
             mContext = context;
             mDecodedBitmapMap = decodedBitmapMap;
         }
@@ -197,8 +198,8 @@ public class ContentListActivity extends AppCompatActivity {
                     if(decodedBitmaps != null && decodedBitmaps.length > 0){
                         BitmapDecoderTask.ContentCategory param = (BitmapDecoderTask.ContentCategory) fTargetImageView.getTag(Common.ViewTagDecodeParam);
                         if(param.equals(decodedBitmaps[0].param)){
-                            // まだリサイクルされていないViewなので、デコードが完了した画像を設定
-                            mDecodedBitmapMap.put(decodedBitmaps[0].decodedBitmap, new Object());
+                            // まだ再利用されていないViewなので、デコードが完了した画像を設定
+                            mDecodedBitmapMap.put(decodedBitmaps[0].decodedBitmap, fTargetImageView);
                             fTargetImageView.setTag(Common.ViewTagIconBitmap, decodedBitmaps[0].decodedBitmap);
                             fTargetImageView.setImageBitmap(decodedBitmaps[0].decodedBitmap);
                         }else{
