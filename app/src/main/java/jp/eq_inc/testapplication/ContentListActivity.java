@@ -180,6 +180,8 @@ public class ContentListActivity extends AppCompatActivity {
                 ImageView iconImageView = (ImageView) ret.findViewById(R.id.ivIcon);
                 Bitmap oldIconBitmap = (Bitmap) iconImageView.getTag(Common.ViewTagIconBitmap);
                 if(oldIconBitmap != null){
+                    ImageView targetImageView = (ImageView) ret.findViewById(R.id.ivIcon);
+                    targetImageView.setImageBitmap(null);
                     mDecodedBitmapMap.remove(oldIconBitmap);
                     oldIconBitmap.recycle();
                     iconImageView.setTag(Common.ViewTagIconBitmap, null);

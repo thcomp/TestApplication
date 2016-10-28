@@ -8,8 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.NavUtils;
-import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +19,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -38,6 +35,7 @@ public class ContentScreenActivity extends AppCompatActivity {
     private View mTutorialView = null;
     private View mAppBarLayout;
     private ViewPager mContentPager;
+    private TextView mTitleView;
     private Toolbar mToolbar;
     private AlertDialog.Builder mDialogBuilder;
     private Handler mMainLooperHandler;
@@ -74,7 +72,7 @@ public class ContentScreenActivity extends AppCompatActivity {
                 addContentView(mTutorialView, params);
             }
 
-            ((TextView)findViewById(R.id.tvTitle)).setText(mContentData.getTitle(this));
+            mTitleView = (TextView)findViewById(R.id.tvTitle);
             mContentPager = (ViewPager)findViewById(R.id.vpContentPager);
             mContentPager.setOnTouchListener(mConsumeViewPagerTouchListener);
             mContentPager.setAdapter(new ContentFragmentPagerAdapter(getSupportFragmentManager()));
@@ -89,6 +87,7 @@ public class ContentScreenActivity extends AppCompatActivity {
              * そのためViewPagerは使用する際に、反対方向に動作する必要がある。
              */
             mContentPager.setCurrentItem(changeContentIndexToCurrentItem(initPageIndex, mContentData.getContentCount(this)), false);
+            setCategoryTitle(initPageIndex);
 
             mDialogBuilder = new AlertDialog.Builder(this);
             mDialogBuilder.setPositiveButton(android.R.string.ok, null);
@@ -138,6 +137,12 @@ public class ContentScreenActivity extends AppCompatActivity {
         super.finish();
     }
 
+    private void setCategoryTitle(int initPageIndex){
+        StringBuilder title = new StringBuilder(mContentData.getTitle(this));
+        title.append(" ( ").append(initPageIndex + 1).append(" / ").append(mContentData.getContentCount(this)).append(" ) ");
+        mTitleView.setText(title.toString());
+    }
+
     private View.OnClickListener mClickOnTutorialListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -160,6 +165,7 @@ public class ContentScreenActivity extends AppCompatActivity {
                 case R.id.vToNextArea:
                     if(pageIndex - 1 >= 0){
                         mContentPager.setCurrentItem(pageIndex - 1, true);
+                        setCategoryTitle(maxPageIndex - pageIndex - 1 + 1);
                     }else{
                         AlertDialog dialog = mDialogBuilder.create();
                         dialog.setTitle(R.string.last_content_in_category);
@@ -170,6 +176,7 @@ public class ContentScreenActivity extends AppCompatActivity {
                 case R.id.vToPrevArea:
                     if(pageIndex + 1 <= (maxPageIndex - 1)){
                         mContentPager.setCurrentItem(pageIndex + 1, true);
+                        setCategoryTitle(maxPageIndex - pageIndex - 1 - 1);
                     }else{
                         AlertDialog dialog = mDialogBuilder.create();
                         dialog.setTitle(R.string.first_content_in_category);
